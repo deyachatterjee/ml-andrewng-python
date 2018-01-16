@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
-from ex8_utils import *
 import scipy.io
 import matplotlib.pyplot as plt
 
@@ -38,22 +37,17 @@ def cofiCostFunc(params, Y, R, num_users, num_movies, num_features, reg):
 	return (J, grad)
 
 def computeNumericalGradient(J,theta):
-    """
-    Computes the gradient of J around theta using finite differences and 
-    yields a numerical estimate of the gradient.
-    """
+    
     
     numgrad = np.zeros_like(theta)
     perturb = np.zeros_like(theta)
     tol = 1e-4
     
     for p in range(len(theta)):
-        # Set perturbation vector
+        
         perturb[p] = tol
         loss1 = J(theta - perturb)
         loss2 = J(theta + perturb)
-	
-        # Compute numerical gradient
         numgrad[p] = (loss2 - loss1)/(2 * tol)
         perturb[p] = 0
 
@@ -70,7 +64,7 @@ def checkCostFunction(reg):
     R = np.zeros_like(Y)
     R[Y != 0] = 1
 
-    # Run gradient checking
+    # gradient checking
     X = np.random.random(np.shape(X_t))
     Theta = np.random.random(np.shape(Theta_t))
     num_users = np.size(Y, 1)
@@ -80,15 +74,12 @@ def checkCostFunction(reg):
     params = np.append(X.flatten(), Theta.flatten())
     
     def reducedCofiCostFunc(p):
-        """ Cheaply decorated cofiCostFunction """
+        
         return cofiCostFunc(p,Y, R, num_users, num_movies, num_features,0)[0]
 
     numgrad = computeNumericalGradient(reducedCofiCostFunc,params)
-
-    J, grad = cofiCostFunc(params, Y, R, num_users, num_movies, num_features, 0)
-    
+    J, grad = cofiCostFunc(params, Y, R, num_users, num_movies, num_features, 0)  
     # Check two gradients
-    # TO FIX: Either gradient checking or actual gradient calculations are off
     np.testing.assert_almost_equal(grad, numgrad)
 
     return
@@ -104,20 +95,17 @@ def normalizeRatings(Y, R):
 
     return (Ynorm, Ymean)
 
-
-
-# Part 1 -- Load Movie Ratings Dataset
 raw_mat = scipy.io.loadmat("ex8_movies.mat")
 R = raw_mat.get("R") # num movies x num users indicator matrix
 Y = raw_mat.get("Y") # num movies x num users ratings matrix
 
-# Visualize matrix
+# Visualize 
 plt.matshow[.]
 plt.xlabel("Users")
 plt.ylabel("Movies")
 plt.show()
 
-# Part 2 -- Collaborative Filtering Cost Function
+# Collaborative Filtering Cost Function
 raw_mat2 = scipy.io.loadmat("ex8_movieParams.mat")
 X = raw_mat2.get("X") # rows correspond to feature vector of the ith movie 
 Theta = raw_mat2.get("Theta") # rows are the parameter vector for jth user
@@ -132,36 +120,34 @@ Theta = Theta[:num_users, :num_features]
 Y = Y[:num_movies, :num_users]
 R = R[:num_movies, :num_users]
 
-# Evaluate Cost Function
+# Evaluate Cost 
 params = np.append(X.flatten(), Theta.flatten())
 J, grad = cofiCostFunc(params, Y, R, num_users, num_movies, num_features, 0)
 np.testing.assert_almost_equal(22.22, J,decimal=2, err_msg="Incorrect unregularized error")
 
-# Part 3 -- Collaborative Filtering Gradient
+# Gradient
 checkCostFunction(0)
 
-# Part 4 -- Collaborative Filtering Cost Regularization
+#Regularization
 J, grad = cofiCostFunc(params, Y, R, num_users, num_movies, num_features, 1.5)
 np.testing.assert_almost_equal(31.34, J,decimal=2, 
     err_msg="Incorrect regularized cost")
 
-# Part 5 -- Collaborative Filtering Gradient Regularization
 checkCostFunction(1.5)
 
-# Part 6 -- Entering ratings for a new users
+# Entering ratings for a new users
 movieList = pd.read_table("movie_ids.txt",encoding='latin-1',names=["Movie"])
 movies = movieList.Movie.tolist()
 my_ratings = [0]*len(movies)
 
 # Check the file movie_idx.txt for id of each movie in our dataset
-# For example, Toy Story (1995) has ID 1, so to rate it "4", you can set
+# For example, Toy Story (1995) has ID 1, so to rate it "4", set
 my_ratings[0] = 4
 
-# Or suppose did not enjoy Silence of the Lambs (1991), you can set
+# Or suppose did not enjoy Silence of the Lambs (1991),set
 my_ratings[97] = 2
 
-# We have selected a few movies we liked / did not like and the ratings we
-# gave are as follows:
+# selected a few movies liked / did not like 
 my_ratings[6] = 3
 my_ratings[11]= 5
 my_ratings[53]= 4
@@ -176,7 +162,7 @@ for i in range(len(movies)):
     if my_ratings[i] > 0:
         print("User rated " + str(movies[i]) + ": " + str(my_ratings[i]))
 
-# Part 8 -- Learning Movie Ratings
+# Learning
 raw_mat = scipy.io.loadmat("ex8_movies.mat")
 R = raw_mat.get("R") # num movies x num users indicator matrix
 Y = raw_mat.get("Y") # num movies x num users ratings matrix
@@ -188,7 +174,7 @@ Y = np.hstack((ratings_col, Y))
 # Add indicators to R
 R = np.hstack((ratings_col !=0, R))
 
-# Normalize Ratings
+# Normalize 
 Ynorm, Ymean = normalizeRatings(Y,R)
 
 # Useful values
@@ -204,7 +190,7 @@ initial_parameters = np.append(X.flatten(), Theta.flatten())
 reg = 10
 
 def reducedCofiCostFunc(p):
-    """ Cheaply decorated cofiCostFunction """
+    
     return cofiCostFunc(p,Y, R, num_users, num_movies, num_features,reg)
 
 results = minimize(reducedCofiCostFunc,
@@ -220,7 +206,7 @@ X = np.reshape(out_params[:num_moves*num_features], (num_movies, num_features))
 Theta = np.reshape(out_params[num_movies*num_features:],
     (num_users,num_features))
 
-# Part 9 -- Recommendation for you
+# Recommendation
 p = np.dot(X, Theta.T)
 my_predictions = p[:,0] + Ymean.T.flatten()
 sorted_predictions = np.sort(my_predictions)
