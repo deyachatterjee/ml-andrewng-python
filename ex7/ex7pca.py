@@ -35,9 +35,7 @@ def recoverData(Z, U, K):
 	return X_rec
 
 def displayData(X):
-    """
-    Displays 2D data stored in design matrix in a nice grid.
-    """
+    
     num_images = len(X)
     rows = int(num_images**.5)
     cols = int(num_images**.5)
@@ -47,26 +45,22 @@ def displayData(X):
     for i in range(rows):
         for j in range(cols):
             # Convert column vector into 32x232 pixel matrix
-            # You have to transpose to have them display correctly
+            #  transpose
             img = X[img_num,:].reshape(32,32).T
             ax[i][j].imshow(img,cmap='gray')
             img_num += 1
 
     return (fig, ax)
 	
-	
-# Part 1 -- Load Example Dataset
 raw_mat = scipy.io.loadmat("ex7data1.mat")
 X = raw_mat.get("X")
 plt.cla()
 plt.plot(X[:,0], X[:,1], 'bo')
 plt.show()
 
-# Part 2 -- Principle Component Analysis
 X_norm, mu, sigma = featureNormalize(X)
 U, S = pca(X_norm)
 
-# Part 3 -- Dimension Reduction
 plt.cla()
 plt.plot(X_norm[:,0], X_norm[:,1], 'bo')
 plt.show()
@@ -80,7 +74,7 @@ plt.plot(X_norm[:,0], X_norm[:,1], 'bo')
 plt.plot(X_rec[:,0], X_rec[:,1], 'rx')
 plt.show()
 
-# Part 4 -- Loading and Visualizing Face Data
+# Loading and Visualizing Face Data
 raw_mat = scipy.io.loadmat("ex7faces.mat")
 X = raw_mat.get("X")
 face_grid, ax = displayData(X[:100, :])
@@ -92,11 +86,11 @@ U, S = pca(X_norm)
 face_grid, ax = displayData(U[:,:36].T)
 face_grid.show()
 
-# Part 6 -- Dimension Reduction on Faces
+# Dimension Reduction on Faces
 K = 100
 Z = projectData(X_norm, U, K)
 
-# Part 7 -- Visualization of Faces after PCA Dimension Reduction
+#Visualization of Faces after PCA
 K = 100
 X_rec  = recoverData(Z, U, K)
 
