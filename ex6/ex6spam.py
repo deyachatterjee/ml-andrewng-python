@@ -1,11 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.io #Used to load the OCTAVE *.mat files
-from sklearn import svm #SVM software
+import scipy.io 
+from sklearn import svm
 import re 
 import nltk, nltk.stem.porter
 
-print "emailSample1.txt:"
+print ("emailSample1.txt:")
 !cat data/emailSample1.txt
 
 """
@@ -21,31 +21,17 @@ groupname-unsubscribe@egroups.com
 """
 
 def preProcess( email ):
-    """
-    Function to do some pre processing (simplification of e-mails).
-    Comments throughout implementation describe what it does.
-    Input = raw e-mail
-    Output = processed (simplified) email
-    """
-    # Make the entire e-mail lower case
     email = email.lower()
-    
-    # Strip html tags (strings that look like <blah> where 'blah' does not
-    # contain '<' or '>')... replace with a space
+    # Strip html tags. replace with a space
     email = re.sub('<[^<>]+>', ' ', email);
-    
     #Any numbers get replaced with the string 'number'
     email = re.sub('[0-9]+', 'number', email)
-    
     #Anything starting with http or https:// replaced with 'httpaddr'
     email = re.sub('(http|https)://[^\s]*', 'httpaddr', email)
-    
     #Strings with "@" in the middle are considered emails --> 'emailaddr'
     email = re.sub('[^\s]+@[^\s]+', 'emailaddr', email);
-    
     #The '$' sign gets replaced with 'dollar'
     email = re.sub('[$]+', 'dollar', email);
-    
     return email
 	
 	
@@ -55,44 +41,29 @@ def email2TokenList( raw_email ):
     stems each word, and returns an (ordered) list of tokens in the e-mail
     """
     
-    # I'll use the NLTK stemmer because it more accurately duplicates the
-    # performance of the OCTAVE implementation in the assignment
     stemmer = nltk.stem.porter.PorterStemmer()
-    
     email = preProcess( raw_email )
 
     #Split the e-mail into individual words (tokens) (split by the delimiter ' ')
-    #but also split by delimiters '@', '$', '/', etc etc
     #Splitting by many delimiters is easiest with re.split()
     tokens = re.split('[ \@\$\/\#\.\-\:\&\*\+\=\[\]\?\!\(\)\{\}\,\'\"\>\_\<\;\%]', email)
     
-    #Loop over each word (token) and use a stemmer to shorten it,
-    #then check if the word is in the vocab_list... if it is,
-    #store what index in the vocab_list the word is
+    #Loop over each token and use a stemmer to shorten it, check if the word is in the vocab_list... if it is, store index
     tokenlist = []
     for token in tokens:
-        
-        #Remove any non alphanumeric characters
+      
         token = re.sub('[^a-zA-Z0-9]', '', token);
-
-        #Use the Porter stemmer to stem the word
         stemmed = stemmer.stem( token )
-        
         #Throw out empty tokens
         if not len(token): continue
-            
         #Store a list of all unique stemmed words
         tokenlist.append(stemmed)
             
     return tokenlist
 
-#vocabulaty list
-
 def getVocabDict(reverse=False):
     """
-    Function to read in the supplied vocab list text file into a dictionary.
-    I'll use this for now, but since I'm using a slightly different stemmer,
-    I'd like to generate this list myself from some sort of data set...
+    Function to read in the supplied vocab list text file into a dictionary
     Dictionary key is the stemmed word, value is the index in the text file
     If "reverse", the keys and values are switched.
     """
@@ -109,24 +80,16 @@ def getVocabDict(reverse=False):
 
 	
 def email2VocabIndices( raw_email, vocab_dict ):
-    """
-    Function that takes in a raw email and returns a list of indices corresponding
-    to the location in vocab_dict for each stemmed word in the email.
-    """
+    #returns a list of indices corresponding to the location in vocab_dict for each stemmed word 
     tokenlist = email2TokenList( raw_email )
     index_list = [ vocab_dict[token] for token in tokenlist if token in vocab_dict ]
     return index_list
 	
-	
 #feature extraction
 
 def email2FeatureVector( raw_email, vocab_dict ):
-    """
-    Function that takes as input a raw email, and returns a vector of shape
-    (n,1) where n is the size of the vocab_dict.
-    The first element in this vector is 1 if the vocab word with index == 1
-    is in the raw_email, 0 otherwise.
-    """
+    # returns a vector of shape(n,1) where n is the size of the vocab_dict.
+    #he first element in this vector is 1 if the vocab word with index == 1 is in raw_email, else 0
     n = len(vocab_dict)
     result = np.zeros((n,1))
     vocab_indices = email2VocabIndices( email_contents, vocab_dict )
@@ -149,9 +112,6 @@ print "Number of non-zero entries is: %d" % sum(test_fv==1)
 datafile = 'data/spamTrain.mat'
 mat = scipy.io.loadmat( datafile )
 X, y = mat['X'], mat['y']
-#NOT inserting a column of 1's in case SVM software does it for me automatically...
-#X =     np.insert(X    ,0,1,axis=1)
-
 # Test set
 datafile = 'data/spamTest.mat'
 mat = scipy.io.loadmat( datafile )
@@ -161,7 +121,6 @@ neg = np.array([X[i] for i in xrange(X.shape[0]) if y[i] == 0])
 print 'Total number of training emails = ',X.shape[0]
 print 'Number of training spam emails = ',pos.shape[0]
 print 'Number of training nonspam emails = ',neg.shape[0]
-
 
 # First we make an instance of an SVM with C=0.1 and 'linear' kernel
 linear_svm = svm.SVC(C=0.1, kernel='linear')
