@@ -1,4 +1,3 @@
-#ex5 Regularized Linear Regression and Bias vs. Variance
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io #Used to load the OCTAVE *.mat files
@@ -27,11 +26,11 @@ def linearRegCostFunction(init_theta,X,y,reg):
 	cost = ((np.sum((np.dot(X,theta) - y)**2))/(2*m) + 
 			(reg/(2*m))*np.sum(theta**2))
 
-	# Regularized gradient
+	# Regularized 
 	gradients = ((np.sum((np.dot(X,theta)-y)*X,axis=0)/m)+
 		(reg/m)*theta.T)
 
-	# Replace gradient for theta_0 with non-regularized gradient
+	# Replace gradient for theta_0 with non-regularized
 	gradients[0] = gradients[0] - (reg/m)*theta.T
 	gradients = gradients.flatten()
 
@@ -105,27 +104,26 @@ plt.xlabel('Change in water level (x)')
 plt.ylabel('Water flowing out of the dam (y)')
 plt.show()
 
-# Part 2 -- Regularized Linear Regression Cost
+# Regularized Cost
 full_X = np.hstack((np.ones_like(y), X))
 theta = np.array([1,1])
 J, g = linearRegCostFunction(theta,full_X,y,0.0)
 
-
-# Part 3 -- Reguliarized Linear Regression Gradient
+# Reguliarized Gradient
 J, g = linearRegCostFunction(theta,full_X,y,1.0)
 
-# Part 4 -- Train Linear Regression
+# Train Linear Regression
 reg_param = 0
 est_theta = trainLinearReg(full_X,y,reg_param)
 
-# Plot linear fit based on estimated parameters
+# Plot linear fit 
 plt.plot(X, y, 'rx', markersize=10, linewidth=1.5)
 plt.plot(X,np.dot(full_X,est_theta),'b-',linewidth=2)
 plt.xlabel('Change in water level (x)')
 plt.ylabel('Water flowing out of the dam (y)')
 plt.show()
 
-# Part 5 -- Learning Curve for Linear Regression
+# Learning Curve
 reg_param = 0.0
 full_Xval = np.hstack((np.ones_like(yval),Xval))
 error_train, error_val = learningCurve(full_X,y,full_Xval,yval,reg_param)
@@ -137,7 +135,7 @@ plt.xlabel('Number of training examples')
 plt.ylabel('Error')
 plt.show()
 
-# Part 6 -- Feature Mapping for Polynomial Regression
+# Feature Mapping for Polynomial Regression
 p = 8
 X_poly = polyFeatures(X,p)
 X_poly, mu, sigma = featureNormalize(X_poly)
@@ -151,7 +149,7 @@ X_poly_val = polyFeatures(Xval,p)
 X_poly_val = np.divide(X_poly_val - mu, sigma)
 X_poly_val = np.hstack((np.ones_like(yval),X_poly_val))
 
-# Part 7 -- Learning Curve for Polynomial Regression
+#Learning Curve for Polynomial Regression
 reg_param = 1.0
 est_theta = trainLinearReg(X_poly,y,reg_param)
 plt.plot(X, y, 'rx', markersize=10, linewidth=1.5)
@@ -169,7 +167,7 @@ plt.xlabel('Number of training examples')
 plt.ylabel('Error')
 plt.show()
 
-# Part 8 -- Validation for selecting regularization parameter
+# Validation for selecting lambda
 lambda_vec, error_train, error_val = validationCurve(full_X,y,full_Xval,yval)
 
 plt.plot(lambda_vec, error_train, lambda_vec, error_val);
