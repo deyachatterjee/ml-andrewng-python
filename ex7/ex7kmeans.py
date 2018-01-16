@@ -1,11 +1,8 @@
 import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
-from ex7_utils import *
 import scipy.io
 import matplotlib.pyplot as plt
-
-
 
 def findClosestCentroids(X, centroids):
 	K = np.size(centroids, 1)
@@ -46,9 +43,7 @@ def runKMeans(X, initial_centroids, max_iters, plot_progress=False):
 	return (centroids, idx)
 	
 def displayData(X):
-    """
-    Displays 2D data stored in design matrix in a nice grid.
-    """
+   
     num_images = len(X)
     rows = int(num_images**.5)
     cols = int(num_images**.5)
@@ -58,7 +53,7 @@ def displayData(X):
     for i in range(rows):
         for j in range(cols):
             # Convert column vector into 32x232 pixel matrix
-            # You have to transpose to have them display correctly
+            # transpose to display correctly
             img = X[img_num,:].reshape(32,32).T
             ax[i][j].imshow(img,cmap='gray')
             img_num += 1
@@ -68,7 +63,7 @@ def displayData(X):
 def kMeansInitCentroids(X, K):
 	return X[np.random.choice(X.shape[0], K)]
 
-# Part 1 -- Find Closest Centroids
+# Find Closest Centroids
 raw_mat = scipy.io.loadmat("ex7data2.mat")
 X = raw_mat.get("X")
 
@@ -77,15 +72,15 @@ K = 3
 initial_centroids = np.array([[3, 3], [6, 2], [8, 5]])
 idx = findClosestCentroids(X, initial_centroids)
 
-# Part 2 -- Compute Means
+#Compute Means
 centroids = computeCentroids(X, idx, K)
 
-# Part 3 -- K-means Clustering
+# K-means Clustering
 max_iters = 10
 initial_centroids = np.array([[3, 3], [6, 2], [8, 5]])
 centroids, idx = runKMeans(X, initial_centroids, max_iters, plot_progress=True)
 
-# Part 4 -- K-means Clustering on Pixels
+#  K-means Clustering on Pixels
 A = plt.imread("bird_small.png")
 plt.imshow(A)
 plt.show()
@@ -99,16 +94,14 @@ max_iters = 10
 
 # Initialize centroids
 initial_centroids = kMeansInitCentroids(X, K)
-
-# Run K-means
 centroids, idx = runKMeans(X, initial_centroids, max_iters, plot_progress=False)
 
-# Part 5 -- Image Compression
+# Image Compression
 idx = findClosestCentroids(X, centroids)
 X_recovered = centroids[idx,:]
 X_recovered = X_recovered.reshape(original_shape)
 
-# Display Images 
+# Display 
 f, (ax1, ax2) = plt.subplots(2, sharex=True, sharey=True)
 ax1.imshow(A)
 ax2.imshow(X_recovered)
