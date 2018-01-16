@@ -7,9 +7,7 @@ from functions import (
     gaussian_kernel, dataset3_params
 )
 
-#necessary functions
-# Your task is to use the cross validation set Xval, yval to 
-# determine the best C and σ parameter to use.
+#use  cross validation set Xval, yval to determine best C and σ 
 
 def dataset3_params(X, y, Xval, yval):
     C_vec = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30]
@@ -25,10 +23,6 @@ def dataset3_params(X, y, Xval, yval):
     max_c_index, max_s_index = np.unravel_index(scores.argmax(), scores.shape)
     return (C_vec[max_c_index], sigma_vec[max_s_index])
 	
-	
-	
-
-# Loading and Visualizing Data 
 print('Loading and Visualizing Data ...\n')
 
 data = sio.loadmat('ex6data1.mat')
@@ -46,11 +40,8 @@ plt.show()
 
 input('Program paused. Press enter to continue.\n')
 plt.close()
-
-#Training Linear SVM 
 print('Training Linear SVM ...\n')
-
-C = 1
+C = 1  #default
 svm = SVC(kernel='linear', C=C)
 svm.fit(X, y.ravel())
 weights = svm.coef_[0]
