@@ -17,11 +17,9 @@ def multivariateGaussian(X, mu, sigma2):
 	k = np.size(mu,1)
 	if ((np.size(sigma2,0) == 1) | (np.size(sigma2,1) == 1)):
 		sigma2 = np.diagflat(sigma2)
-
-	# De-mean data 
+	# De-mean 
 	X = X - mu
-
-	# Calculate p-values of data
+	# Calculate p-values
 	p = ((1 / (2* (np.pi)**(-k / 2) * np.linalg.det(sigma2)**(-.5))) *
 		np.exp(-.5 * np.sum(np.dot(X, np.linalg.inv(sigma2)) * X, 1)))
 
@@ -64,7 +62,6 @@ def selectThreshold(yval, pval):
 	return (bestEpsilon, bestF1)
 	
 	
-# Part 1 -- Load Example Data
 raw_mat = scipy.io.loadmat("ex8data1.mat")
 X = raw_mat.get("X")
 Xval = raw_mat.get("Xval")
@@ -75,17 +72,14 @@ plt.xlabel('Latency (ms)')
 plt.ylabel('Throughput (mb/s)');
 plt.show()
 
-# Part 2 -- Estimate the dataset statistics
 mu, sigma2 = estimateGaussian(X) # returns flattened arrays
 
 # Density of data based on multivariate normal distribution
 p = multivariateGaussian(X, mu, sigma2)
-
-# Visualize the fit
 fig, ax = visualizeFit(X,  mu, sigma2)
 fig.show()
 
-# Part 3 -- Find Outliers
+# Find Outliers
 pval = multivariateGaussian(Xval, mu, sigma2)
 epsilon, F1 = selectThreshold(yval, pval)
 
@@ -94,7 +88,7 @@ fig, ax = visualizeFit(X,  mu, sigma2)
 ax.plot(X[outliers, 0], X[outliers, 1], 'ro', linewidth=2, markersize=10)
 fig.show()
 
-# Part 4 -- Multi-Dimensional Outliers
+# Multi-Dimensional Outliers
 raw_mat2 = scipy.io.loadmat("ex8data2.mat")
 X = raw_mat2.get("X")
 Xval = raw_mat2.get("Xval")
